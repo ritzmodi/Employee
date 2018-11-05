@@ -1,0 +1,96 @@
+
+
+<html>
+        <head>
+            <title>my first decentralized application</title>
+        </head>
+        <body>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>
+            <script src="web3.min.js"></script>
+            <div>
+                    <p id="mybalance">Add a employee: </p>
+                    <input id="employeeid" />
+                    <input id="firstname" />
+                    <input id="lastname" />
+                    <button id="submitemployee">Submit Employee</button>
+
+                    <p>&nbsp;</p>
+                    <p>&nbsp;</p>
+                    <input id="empid" />
+                    <button id="getEmployee">Get Employee Details</button>
+                    <p id="empdetails">Employee details </p>
+                    <table id="mydetails"></table>
+            </div>
+            <script>
+                var contract;
+                var contractAddress;
+                var abi;
+    
+                $('#document').ready(function(){
+                    initcontract();
+
+                })
+    
+                function initcontract() {
+                    contractAddress = "0x353b3B24CE555E91297E0602AEc78887E4c4FB6a"
+                    abi = [ { "constant": false, "inputs": [ { "name": "_id", "type": "uint256" }, { "name": "_firstname", "type": "bytes32" }, { "name": "_lastname", "type": "bytes32" } ], "name": "AddAnEmployee", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "incomingId", "type": "uint256" } ], "name": "ListAnEmployee", "outputs": [ { "name": "_id", "type": "uint256" }, { "name": "_firstname", "type": "bytes32" }, { "name": "_lastname", "type": "bytes32" } ], "payable": false, "stateMutability": "view", "type": "function" } ]
+    
+                    window.web3 = new Web3(web3.currentProvider);
+        
+                    contract = new web3.eth.Contract(abi,contractAddress)
+    
+                }
+    
+
+    
+                $('#submitemployee').click(function() {
+                   // window.web3 = new Web3("https://ropsten.infura.io/v3/c60dd0ad073b43c7851f1c70720dafb3");
+                   // contract = new web3.eth.Contract(abi,contractAddress)
+                    contract.methods.AddAnEmployee(document.getElementById('employeeid').value,web3.utils.asciiToHex( document.getElementById('firstname').value),web3.utils.asciiToHex( document.getElementById('lastname').value) ).send({from:'0xde437544443c8f749ed5fe70c31e0460e3636bbc'}).then(function(){
+    
+
+                    })
+                })
+    
+    
+                $('#getEmployee').click(function() {
+                   // window.web3 = new Web3("https://ropsten.infura.io/v3/c60dd0ad073b43c7851f1c70720dafb3");
+                   // contract = new web3.eth.Contract(abi,contractAddress)
+                   getemp(document.getElementById('empid').value)
+                })
+
+        function getemp(id){
+
+            contract.methods.ListAnEmployee(id).call().then(function(candidates) {
+                var tablestructure = document.getElementById('mydetails');
+                tablestructure.border = "1";
+                $("#mydetails").empty();
+                var tbody = document.createElement("tbody");
+
+
+               // for(var i=0; i < ids.length; i++){
+                    var tr = document.createElement("tr");
+                    
+                        var td = document.createElement("td");
+                        var txt = document.createTextNode(candidates[0]);
+                        td.appendChild(txt);
+                        tr.appendChild(td);
+
+                        td = document.createElement("td");
+                        txt = document.createTextNode(web3.utils.hexToUtf8 ( candidates[1]));
+                        td.appendChild(txt);
+                        tr.appendChild(td);
+
+                        td = document.createElement("td");
+                        txt = document.createTextNode(web3.utils.hexToUtf8 (candidates[2]));
+                        td.appendChild(txt);
+                        tr.appendChild(td);
+                    
+                    tbody.appendChild(tr);
+                    tablestructure.appendChild(tbody);
+               // }
+            })
+        }
+            </script>
+        </body>
+    </html>
